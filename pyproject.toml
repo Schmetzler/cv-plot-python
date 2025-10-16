@@ -1,0 +1,16 @@
+[project]
+name = "cv-plot"
+version = "0.1.0"
+description = "A plot library using pure opencv."
+readme = "README.md"
+authors = [
+    { name = "Dominik Wetzel", email = "dimonok@web.de" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "opencv-python>=4.12.0.88",
+]
+
+[build-system]
+requires = ["uv_build>=0.8.19,<0.9.0"]
+build-backend = "uv_build"

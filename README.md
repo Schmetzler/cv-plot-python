@@ -1,3 +1,10 @@
+# cv-plot-python
+
+A python implementation of the CvPlot library from [PROFACTOR](https://www.profactor.at/).
+I needed a fast drawing library as using matplotlib within an application is cumbersome and slow. So I searched for another opportunity using pure OpenCV and found this... So I reimplemented it in python using the Gemini Flash 2.5 Model from Google.
+
+---- ORIGINAL README BELOW ----
+
 ![CvPlot](doc/img/contours.PNG)
 
 [![Build status](https://github.com/Profactor/cv-plot/workflows/CI/badge.svg)](https://github.com/Profactor/cv-plot/actions)
