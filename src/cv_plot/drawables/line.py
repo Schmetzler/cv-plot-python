@@ -1,11 +1,12 @@
 import numpy as np
 from typing import Tuple, List, Any, Optional, Union
 from enum import Enum
-from cv_plot.util import draw_cast
+
 import cv2
 import math
 
 from cv_plot.core import RenderTarget, Drawable
+from cv_plot.core.util import draw_cast
 
 class MarkerType(Enum):
     NONE = 0
@@ -445,7 +446,7 @@ class Series(LineBase):
         if markerType == MarkerType.NONE and lineWidth == 0:
             return
             
-        mat = renderTarget.outerMat()
+        mat = renderTarget.innerMat()
         
         # Fixed point arithmetic for sub-pixel accuracy in OpenCV
         shift = 3

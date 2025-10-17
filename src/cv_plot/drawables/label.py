@@ -3,8 +3,8 @@ import cv2
 from typing import Tuple, List, Any, Optional
 
 from cv_plot.core import RenderTarget, Drawable
-from cv_plot.util import paint
-from . import *
+from cv_plot.core.util import paint
+from .axis import YAxis, XAxis
 
 class YLabel(Drawable):
     """
@@ -177,7 +177,7 @@ class XLabel(Drawable):
         # The offset 35 is used to position the label below the plot area/X-axis.
         label_pos_x = xcenter - w // 2
         label_pos_y = bottom + 35
-        labelPos: Point = (label_pos_x, label_pos_y)
+        labelPos: tuple = (label_pos_x, label_pos_y)
 
         # 2. Draw text
         # C++: cv::putText(outerMat, _label, labelPos, _fontFace, _fontScale, _color, _fontThickness, cv::LINE_AA);
@@ -251,7 +251,7 @@ class Title(Drawable):
         # This places the baseline 1.5 times the text height above the inner plot Y start.
         title_pos_y = inner_y - (text_h * 3) // 2 
         
-        titlePos: Point = (title_pos_x, title_pos_y)
+        titlePos: tuple = (title_pos_x, title_pos_y)
 
         # 3. Draw text
         # C++: cv::putText(outerMat, _title, titlePos, _fontFace, _fontScale, _color, _fontThickness, cv::LINE_AA);

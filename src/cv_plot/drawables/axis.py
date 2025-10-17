@@ -4,7 +4,7 @@ import math
 from typing import Tuple, List, Any, Optional
 
 from cv_plot.core import Drawable, RenderTarget
-from cv_plot.util import format_value, calc_ticks_linear, calc_ticks_log
+from cv_plot.core.util import format_value, calc_ticks_linear, calc_ticks_log
 
 class XAxis(Drawable):
     """

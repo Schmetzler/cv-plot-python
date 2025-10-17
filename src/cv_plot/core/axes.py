@@ -6,8 +6,7 @@ from typing import Tuple, Optional, List, Any, Union
 from .transformation import *
 from .projection import RawProjection, Projection, RenderTarget
 from .drawable import Drawable, DrawableContainer
-from cv_plot.drawables import *
-from cv_plot.util import normalize
+from .util import normalize
 
 class Axes(DrawableContainer):
     """
@@ -157,34 +156,17 @@ class Axes(DrawableContainer):
         rawProjection = RawProjection()
         
         rawProjection.kx = innerRect[2] / viewport[2]
-        rawProjection.offset = (innerRect[0] - viewport[0] * rawProjection.kx, 0.0)
-        
         rawProjection.ky = (innerRect[3] / viewport[3]) * (1.0 if self._yReverse else -1.0)
+
         rawProjection.offset = (
-            rawProjection.offset[0],
-            innerRect[1] - (viewport[1] + (0.0 if self._yReverse else viewport[3])) * rawProjection.ky
+            -viewport[0] * rawProjection.kx,
+            -(viewport[1] + (0.0 if self._yReverse else viewport[3])) * rawProjection.ky
         )
         
         rawProjection.transformation = self._transformation
         rawProjection.inner_rect = innerRect
         
         return rawProjection
-
-    def _render_internal(self, mat: np.ndarray, destinationSize: Tuple[int, int]) -> None:
-        """Initializes the canvas and calls render on all drawables."""
-        dst_w, dst_h = destinationSize
-        
-        if dst_w < 0 or dst_h < 0: destinationSize = (0, 0)
-            
-        rawProjection = self._getRawProjection(destinationSize)
-        
-        mat.resize((dst_h, dst_w, 3))
-        mat.fill(255)
-        
-        renderTarget = RenderTarget(rawProjection, mat)
-        
-        for drawable in self.drawables():
-            drawable.render(renderTarget)
 
     def zoom(self, size: Tuple[int, int], outerPos: Tuple[int, int], scalex: float, scaley: float) -> None:
         """Zooms the view based on the current limits and a center point."""
@@ -249,17 +231,34 @@ class Axes(DrawableContainer):
         """Returns the calculated Projection object."""
         return Projection(self._getRawProjection(size))
 
-    def render(self, cols: Union[tuple,int], rows: Optional[int] = None) -> Union[np.ndarray, None]:
+    def render(self, cols: Union[tuple,int, np.ndarray], rows: Optional[int] = None) -> Union[np.ndarray, None]:
         """Handles all three C++ render overloads."""
-        if isinstance(cols, (tuple, list, np.ndarray)):
+        mat = None
+        if isinstance(cols, np.ndarray):
+            mat = cols
+            rows, cols = mat.shape[:2]
+        elif isinstance(cols, (tuple, list)):
             rows = cols[1]
             cols = cols[0]
         elif rows is None:
             rows = cols
 
-        mat_out = np.zeros((rows, cols, 3), dtype=np.uint8)
-        self._render_internal(mat_out, (cols, rows))
-        return mat_out
+        destinationSize = (cols, rows)
+        if cols < 0 or rows < 0: destinationSize = (0, 0)
+            
+        rawProjection = self._getRawProjection(destinationSize)
+        
+        if mat is None:
+            mat = np.full(shape=(rows, cols, 3), fill_value=255, dtype=np.uint8)
+        else:
+            mat.fill(255)
+        
+        renderTarget = RenderTarget(rawProjection, mat)
+        
+        for drawable in self.drawables():
+            drawable.render(renderTarget)
+
+        return mat
 
     def setMargins(self, left: int, right: int, top: int, bottom: int) -> 'Axes':
         self._leftMargin, self._rightMargin, self._topMargin, self._bottomMargin = left, right, top, bottom
@@ -277,19 +276,24 @@ class Axes(DrawableContainer):
         self.findOrCreate(Title).setTitle(title)
         return self
 
-    def enableHorizontalGrid(self, enable: bool) -> 'Axes':
+    def enableHorizontalGrid(self, enable: bool = True) -> 'Axes':
         grid = self.findOrCreate(HorizontalGrid).setEnabled(enable)
         if enable: grid.setYAxis(self._find(YAxis))
         return self
 
-    def enableVerticalGrid(self, enable: bool) -> 'Axes':
+    def enableVerticalGrid(self, enable: bool = True) -> 'Axes':
         grid = self.findOrCreate(VerticalGrid).setEnabled(enable)
         if enable: grid.setXAxis(self._find(XAxis))
         return self
 
     # --- Limit Accessors ---
 
-    def setXLim(self, xlim: Tuple[float, float]) -> 'Axes':
+    def setXLim(self, xlim: float | Tuple[float, float], upper=None ) -> 'Axes':
+        if isinstance(xlim, float):
+            if upper is None:
+                upper = xlim
+                xlim = 0
+            xlim = (xlim, upper)
         if self._transformation: xlim = self._transformation.transformXLim(xlim)
         self._xLim = xlim
         self._xLimAuto = False
@@ -299,13 +303,18 @@ class Axes(DrawableContainer):
         if self._transformation: return self._transformation.untransformXLim(self._xLim)
         return self._xLim
 
-    def setXLimAuto(self, xLimAuto: bool) -> 'Axes':
+    def setXLimAuto(self, xLimAuto: bool = True) -> 'Axes':
         self._xLimAuto = xLimAuto
         return self
 
     def getXLimAuto(self) -> bool: return self._xLimAuto
 
-    def setYLim(self, ylim: Tuple[float, float]) -> 'Axes':
+    def setYLim(self, ylim: float | Tuple[float, float], upper=None) -> 'Axes':
+        if isinstance(ylim, float):
+            if upper is None:
+                upper = ylim
+                ylim = 0
+            ylim = (ylim, upper)
         if self._transformation: ylim = self._transformation.transformYLim(ylim)
         self._yLim = ylim
         self._yLimAuto = False
@@ -315,27 +324,27 @@ class Axes(DrawableContainer):
         if self._transformation: return self._transformation.untransformYLim(self._yLim)
         return self._yLim
 
-    def setYLimAuto(self, yLimAuto: bool) -> 'Axes':
+    def setYLimAuto(self, yLimAuto: bool = True) -> 'Axes':
         self._yLimAuto = yLimAuto
         return self
 
     def getYLimAuto(self) -> bool: return self._yLimAuto
 
     # --- Other Property Accessors ---
-    def setYReverse(self, reverse: bool) -> 'Axes': self._yReverse = reverse; return self
+    def setYReverse(self, reverse: bool = True) -> 'Axes': self._yReverse = reverse; return self
     def getYReverse(self) -> bool: return self._yReverse
-    def setFixedAspectRatio(self, fixed: bool) -> 'Axes': self._fixedAspectRatio = fixed; return self
+    def setFixedAspectRatio(self, fixed: bool = True) -> 'Axes': self._fixedAspectRatio = fixed; return self
     def getFixedAspectRatio(self) -> bool: return self._fixedAspectRatio
     def setAspectRatio(self, aspectRatio: float) -> 'Axes': self._aspectRatio = aspectRatio; return self
     def getAspectRatio(self) -> float: return self._aspectRatio
-    def setXTight(self, tight: bool) -> 'Axes': self._xTight = tight; return self
+    def setXTight(self, tight: bool = True) -> 'Axes': self._xTight = tight; return self
     def getXTight(self) -> bool: return self._xTight
-    def setYTight(self, tight: bool) -> 'Axes': self._yTight = tight; return self
+    def setYTight(self, tight: bool = True) -> 'Axes': self._yTight = tight; return self
     def getYTight(self) -> bool: return self._yTight
-    def setTightBox(self, tight: bool) -> 'Axes': self._tightBox = tight; return self
+    def setTightBox(self, tight: bool = True) -> 'Axes': self._tightBox = tight; return self
     def getTightBox(self) -> bool: return self._tightBox
-    def setXLog(self, log: bool) -> 'Axes': self._xLog = log; self._setLogTransformation(); return self
+    def setXLog(self, log: bool = True) -> 'Axes': self._xLog = log; self._setLogTransformation(); return self
     def getXLog(self) -> bool: return self._xLog
-    def setYLog(self, log: bool) -> 'Axes': self._yLog = log; self._setLogTransformation(); return self
+    def setYLog(self, log: bool = True) -> 'Axes': self._yLog = log; self._setLogTransformation(); return self
     def getYLog(self) -> bool: return self._yLog
 

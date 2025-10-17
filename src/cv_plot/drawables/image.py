@@ -5,7 +5,7 @@ import math
 import copy
 
 from cv_plot.core import RenderTarget, Drawable
-from cv_plot.util import paint
+from cv_plot.core.util import paint
 
 class ImageUtils:
     """Helper methods converted from the CvPlot::Imp namespace."""
