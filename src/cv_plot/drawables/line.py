@@ -229,11 +229,12 @@ class Series(LineBase):
 
     # --- Constructor Overloads ---
     
-    def __init__(self, data_or_x: Union[np.ndarray, List[Any]] = None, y: Optional[Union[np.ndarray, List[Any]]] = None, lineSpec: str = "-"):
+    def __init__(self, data_or_x: Union[np.ndarray, List[Any]] = None, y: Optional[Union[np.ndarray, List[Any]]] = None, lineSpec: str = "-", fill=False):
         super().__init__(lineSpec)
 
         self._internalX = []
         self._boundingRect = (0.0, 0.0, 0.0, 0.0)
+        self.fill = fill
         # Determine which C++ constructor is being called
         self._x = []
         self._y = []
@@ -463,7 +464,7 @@ class Series(LineBase):
         
         # 2. Draw Line (Polyline)
         # C++: if (_parent.getLineType() == LineType::Solid)
-        if self.getLineType() == LineType.SOLID:
+        if self.getLineType() == LineType.SOLID or self.fill:
             # C++: if (shiftedPoints.empty()) { shiftedPoints = getShiftedPoints(points, shiftScale); }
             if shiftedPoints is None:
                 shiftedPoints = self._get_shifted_points(points, shiftScale)
@@ -472,7 +473,11 @@ class Series(LineBase):
             polylines_data = [np.array(group, dtype=np.int32) for group in shiftedPoints]
             
             # C++: cv::polylines(mat, shiftedPoints, false, color, lineWidth, cv::LINE_AA, shift);
-            cv2.polylines(mat, polylines_data, False, color, lineWidth, cv2.LINE_AA, shift)
+            if self.getLineType() == LineType.SOLID:
+                cv2.polylines(mat, polylines_data, self.fill, color, lineWidth, cv2.LINE_AA, shift)
+            if self.fill:
+                cv2.fillPoly(mat, polylines_data, color, shift=shift)
+                
         
         # 3. Draw Markers (Circle)
         # C++: if (_markerType == MarkerType::Circle)

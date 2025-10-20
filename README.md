@@ -18,6 +18,14 @@ img = ax.render(600,400) # now you have an standard OpenCV image (which is a np.
 plt.show(img)
 ```
 
+To use alpha blending you have to set the alpha value AFTER creating the Drawable, like so:
+
+```python
+# Can also now fill a polygon
+s = ax.create(cvplt.Series, x=[0,1,2,3,2,1], y=[2,3,1,5,6,-2], lineSpec="r-", fill=True)
+s.alpha=0.3
+```
+
 You can do a little bit more in the sense of styling and setting y and x limits but thats basically it.
 
 ## Extending

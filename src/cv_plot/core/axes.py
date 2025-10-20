@@ -66,6 +66,8 @@ class Axes(DrawableContainer):
             if h == 0.0: return (y - 1.0, y + 1.0)
             return (y, y + h)
         return self._yLim
+
+
             
     def _getViewport(self, boundingRect: Tuple[float, float, float, float]) -> Tuple[float, float, float, float]:
         """Calculates the final viewport limits, applying auto-limits and padding."""
@@ -256,7 +258,12 @@ class Axes(DrawableContainer):
         renderTarget = RenderTarget(rawProjection, mat)
         
         for drawable in self.drawables():
-            drawable.render(renderTarget)
+            if drawable.alpha < 1.0:
+                rt = RenderTarget(rawProjection, renderTarget.outerMat().copy())
+                drawable.render(rt)
+                renderTarget.outerMat()[:,:] = cv2.addWeighted(renderTarget.outerMat(), 1-drawable.alpha, rt.outerMat(), drawable.alpha, 0)
+            else:
+                drawable.render(renderTarget)
 
         return mat
 

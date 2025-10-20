@@ -16,8 +16,9 @@ class Drawable:
         self._font_scale: float = 0.4
         self._font_thickness: int = 1
         self._color = (0,0,0)
-
         self._name = name
+
+        self.alpha = 1.0
 
     # The C++ move constructor and destructor are implicit in Python.
     # Drawable(Drawable &&a) and ~Drawable() are not needed.
@@ -69,9 +70,9 @@ class DrawableContainer:
 
     # --- Creation and Finding ---
 
-    def create(self, SomeDrawable: type[Drawable], *args: Any) -> Drawable:
+    def create(self, SomeDrawable: type[Drawable], *args: Any, **kwargs: Any) -> Drawable:
         """Creates an instance of SomeDrawable and appends it to the deque."""
-        ptr: Drawable = SomeDrawable(*args)
+        ptr: Drawable = SomeDrawable(*args, **kwargs)
         self._drawables.append(ptr)
         return ptr
 
