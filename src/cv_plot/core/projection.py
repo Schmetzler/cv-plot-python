@@ -51,6 +51,12 @@ class RawProjection():
             
         return unproj_point
 
+    @property
+    def area(self):
+        if self.inner_rect is None:
+            return 0
+        return self.inner_rect[2] * self.inner_rect[3]
+
 class Projection():
     def __init__(self, rawProjection : RawProjection):
         self._rawProjection = rawProjection
