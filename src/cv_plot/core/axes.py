@@ -7,6 +7,7 @@ from .transformation import *
 from .projection import RawProjection, Projection, RenderTarget
 from .drawable import Drawable, DrawableContainer
 from .util import normalize
+from cv_plot.drawables import XAxis,XLabel,YAxis,YLabel,Title
 
 class Axes(DrawableContainer):
     """

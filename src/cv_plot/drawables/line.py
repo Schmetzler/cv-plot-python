@@ -183,7 +183,7 @@ class HorizontalVerticalLine(LineBase):
             pt2 = (mat.shape[1] * shift_scale, scaled) # mat.shape[1] is width (cols)
         else:
             projected_x, _ = renderTarget.project((self._pos, 0.0))
-            scaled = draw_cast(projected_y * shift_scale)
+            scaled = draw_cast(projected_x * shift_scale)
             pt1 = (scaled, 0)
             pt2 = (scaled, mat.shape[0] * shift_scale) # mat.shape[1] is width (cols)
 
@@ -458,7 +458,9 @@ class Series(LineBase):
         if len(self._internalX) == len(self._y):
             for i in range(len(self._internalX)):
                 # C++: points.push_back(renderTarget.project(cv::Point2d(_internalX[i], _y[i])));
-                points.append(renderTarget.project((self._internalX[i], self._y[i])))
+                pt = renderTarget.project((self._internalX[i], self._y[i]))
+                if np.isfinite(pt).all()
+                    points.append(pt)
         
         shiftedPoints = None
         

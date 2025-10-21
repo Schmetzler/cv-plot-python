@@ -5,4 +5,4 @@ from .line import LineBase, HorizontalLine, VerticalLine, Series
 from .axis import XAxis, YAxis
 from .label import XLabel, YLabel, Title
 from .image import Image
-from .legend import Legend, LegendLabel
+#from .legend import Legend, LegendLabel
