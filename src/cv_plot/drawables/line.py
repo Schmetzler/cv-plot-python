@@ -459,7 +459,7 @@ class Series(LineBase):
             for i in range(len(self._internalX)):
                 # C++: points.push_back(renderTarget.project(cv::Point2d(_internalX[i], _y[i])));
                 pt = renderTarget.project((self._internalX[i], self._y[i]))
-                if np.isfinite(pt).all()
+                if np.isfinite(pt).all():
                     points.append(pt)
         
         shiftedPoints = None
