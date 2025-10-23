@@ -296,7 +296,7 @@ class Axes(DrawableContainer):
 
     # --- Limit Accessors ---
 
-    def setXLim(self, xlim: float | Tuple[float, float], upper=None ) -> 'Axes':
+    def setXLim(self, xlim: Union[float,Tuple[float, float]], upper=None ) -> 'Axes':
         if isinstance(xlim, float):
             if upper is None:
                 upper = xlim
@@ -317,7 +317,7 @@ class Axes(DrawableContainer):
 
     def getXLimAuto(self) -> bool: return self._xLimAuto
 
-    def setYLim(self, ylim: float | Tuple[float, float], upper=None) -> 'Axes':
+    def setYLim(self, ylim: Union[float, Tuple[float, float]], upper=None) -> 'Axes':
         if isinstance(ylim, float):
             if upper is None:
                 upper = ylim

@@ -36,8 +36,10 @@ def plotImage(img, pos = None) -> Axes:
 
 def show(axes_or_img, width=None, height=None, name="IMG", blocking=True):
     if isinstance(axes_or_img, Axes):
-        if width is None or height is None:
-            raise ValueError("If you want to show an axes you must provide width and height (in px)")
+        if width is None:
+            width = 400
+        if height is None:
+            height = 400
         img = axes_or_img.render(width, height)
     elif isinstance(axes_or_img, np.ndarray):
         img = axes_or_img
@@ -45,8 +47,12 @@ def show(axes_or_img, width=None, height=None, name="IMG", blocking=True):
         raise ValueError("axes_or_img must be either an Axes object or an np.ndarray")
     cv2.imshow(name, img)
     if blocking:
-        cv2.waitKey()
-        cv2.destroyAllWindows()
+        try:
+            while True:
+                if cv2.waitKey(25) >= 0:
+                    break
+        finally:
+            cv2.destroyAllWindows()
     else:
         cv2.waitKey(1)
     return

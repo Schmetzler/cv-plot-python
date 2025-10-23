@@ -60,7 +60,7 @@ class Legend(Drawable):
     Impl fields are now explicitly defined as instance variables.
     """
 
-    def __init__(self, parentAxes=None):
+    def __init__(self, parentAxes=None, omitNoName=True):
         """
         Equivalent to Legend::Legend(). Initializes Impl fields.
         """
@@ -70,6 +70,7 @@ class Legend(Drawable):
         self._width = 180
         self._height = 60
         self._margin = 10
+        self._omit = omitNoName
 
     def setParentAxes(self, a_parentAxes: Axes) -> None:
         """Equivalent to void Legend::setParentAxes(...)."""
@@ -80,7 +81,10 @@ class Legend(Drawable):
         if self._parentAxes is None:
             return
 
-        series_vec: List[Series] = [drawable for drawable in self._parentAxes.drawables() if isinstance(drawable, Series)]
+        if self._omit:
+            series_vec: List[Series] = [drawable for drawable in self._parentAxes.drawables() if isinstance(drawable, Series) and drawable.getName()]
+        else:
+            series_vec: List[Series] = [drawable for drawable in self._parentAxes.drawables() if isinstance(drawable, Series)]
 
         if not series_vec:
             return
