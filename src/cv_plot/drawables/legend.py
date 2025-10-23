@@ -60,17 +60,13 @@ class Legend(Drawable):
     Impl fields are now explicitly defined as instance variables.
     """
 
-    def __init__(self):
+    def __init__(self, parentAxes=None):
         """
         Equivalent to Legend::Legend(). Initializes Impl fields.
         """
-        # C++ Impl field initialization:
-        # CvPlot::Axes *parentAxes{nullptr};
-        # int _width = 180;
-        # int _height = 60;
-        # int _margin = 10;
+        super().__init__()
         
-        self._parentAxes = None
+        self._parentAxes = parentAxes
         self._width = 180
         self._height = 60
         self._margin = 10
