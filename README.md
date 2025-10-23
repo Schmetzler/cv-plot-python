@@ -28,6 +28,12 @@ s.alpha=0.3
 
 You can do a little bit more in the sense of styling and setting y and x limits but thats basically it.
 
+### Legend
+
+As I had some circular import errors to use a Legend (as it imports `Axes` from `core`) you have to import it after `import cv_plot.plot as cvplt` with something like:
+
+`from cv_plot.drawables.legend import Legend`
+
 ## Extending
 
 You can add additionaly drawables by inheriting from `cv_plot.core.Drawable`. There you must especially implement the `render(RawProjection)` function and the `getBoundingRect()` function (to automatical determine the axis limits). With the `RawProjection` you can `project` points from data space into display space and reverse with  `unproject`. The `RawProjection` contains an `inner_rect` which is the inside of the axis boundaries (and mainly the drawing area).
