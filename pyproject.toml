@@ -11,6 +11,28 @@ license = {text = "MIT License"}
 dependencies = [
     "opencv-python>=4.12.0.88",
 ]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    
+    # Python Support
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    
+    # Audience & Environment
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    
+    # Topics
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 
 [build-system]
 requires = ["uv_build>=0.8.19,<0.9.0"]
